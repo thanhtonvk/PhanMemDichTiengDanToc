@@ -1,4 +1,5 @@
 import 'dart:ui';
+import 'package:dich_tieng_dan_toc/common.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_tts/flutter_tts.dart';
@@ -22,6 +23,9 @@ class TranslateState extends State<Translate> {
 
   String _sourceLanguage = 'Kinh';
   String _targetLanguage = 'Pà Thẻn';
+
+  List<String> listSource = Common.kinh;
+  List<String> listTarget = Common.pathen;
   String _inputText = '';
   String _translateText = '';
   final List<String> _languages = [
@@ -36,17 +40,22 @@ class TranslateState extends State<Translate> {
     super.initState();
     _initSpeech();
     flutterTts = FlutterTts();
-    _setupTTS();
+    _setupTTS('vi-VN');
   }
 
-  Future<void> _setupTTS() async {
-    await flutterTts.setLanguage("vi-VN"); // Tiếng Việt
+  Future<void> _setupTTS(String lang) async {
+    await flutterTts.setLanguage(lang); // Tiếng Việt
     await flutterTts.setSpeechRate(0.7); // Tốc độ nói
     await flutterTts.setPitch(1.0); // Cao độ
   }
 
   Future<void> _speak(String text) async {
     if (text.isNotEmpty) {
+      if (_targetLanguage == 'Anh') {
+        _setupTTS('en-US');
+      } else {
+        _setupTTS('vi-VN');
+      }
       await flutterTts.speak(text);
     }
   }
@@ -82,23 +91,31 @@ class TranslateState extends State<Translate> {
   void _translate() {
     // Thay thế bằng API dịch thực sự nếu cần
     setState(() {
-      _translateText = "Dịch: $_inputText ($_sourceLanguage -> $_targetLanguage)";
+      for (int i = 0; i < listSource.length; i++) {
+        if (listSource[i].toLowerCase() == _inputText.toLowerCase()) {
+          _translateText = listTarget[i];
+          break;
+        }
+      }
     });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text(
-          'HỆ THỐNG HỖ TRỢ GIAO TIẾP CHO NGƯỜI DÂN TỘC',
-        ),
-      ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
+            const Text(
+              'HỆ THỐNG HỖ TRỢ GIAO TIẾP CHO NGƯỜI DÂN TỘC',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                  fontSize: 15,
+                  color: Colors.black,
+                  fontWeight: FontWeight.bold),
+            ),
             Row(
               children: [
                 Expanded(
@@ -114,6 +131,18 @@ class TranslateState extends State<Translate> {
                     onChanged: (value) {
                       setState(() {
                         _sourceLanguage = value!;
+                        if (_sourceLanguage == 'Kinh') {
+                          listSource = Common.kinh;
+                        }
+                        if (_sourceLanguage == 'Anh') {
+                          listSource = Common.anh;
+                        }
+                        if (_sourceLanguage == 'Pà Thẻn') {
+                          listSource = Common.pathen;
+                        }
+                        if (_sourceLanguage == 'Dao') {
+                          listSource = Common.dao;
+                        }
                       });
                     },
                   ),
@@ -132,6 +161,18 @@ class TranslateState extends State<Translate> {
                     onChanged: (value) {
                       setState(() {
                         _targetLanguage = value!;
+                        if (_targetLanguage == 'Kinh') {
+                          listTarget = Common.kinh;
+                        }
+                        if (_targetLanguage == 'Anh') {
+                          listTarget = Common.anh;
+                        }
+                        if (_targetLanguage == 'Pà Thẻn') {
+                          listTarget = Common.pathen;
+                        }
+                        if (_targetLanguage == 'Dao') {
+                          listTarget = Common.dao;
+                        }
                       });
                     },
                   ),
@@ -179,12 +220,28 @@ class TranslateState extends State<Translate> {
               },
               child: const Text('Phát âm nội dung dịch'),
             ),
+            const SizedBox(
+              height: 16,
+            ),
+            Expanded(
+                child: ListView.builder(
+              itemCount: listSource.length,
+              itemBuilder: (BuildContext context, int index) {
+                final item = listSource[index];
+                return ListTile(
+                    leading: Icon(
+                      Icons.text_snippet,
+                      color: Colors.blue,
+                    ),
+                    title: Text(item));
+              },
+            ))
           ],
         ),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed:
-        _speechToText.isNotListening ? _startListening : _stopListening,
+            _speechToText.isNotListening ? _startListening : _stopListening,
         tooltip: 'Listen',
         child: Icon(_speechToText.isNotListening ? Icons.mic_off : Icons.mic),
       ),
