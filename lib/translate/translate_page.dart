@@ -41,6 +41,7 @@ class TranslateState extends State<Translate> {
     _initSpeech();
     flutterTts = FlutterTts();
     _setupTTS('vi-VN');
+    inputNoiDung = TextEditingController(text: _inputText);
   }
 
   Future<void> _setupTTS(String lang) async {
@@ -86,12 +87,16 @@ class TranslateState extends State<Translate> {
     setState(() {
       _lastWords = result.recognizedWords;
       _inputText = _lastWords;
+      inputNoiDung.text = _inputText;
     });
   }
+
+  late TextEditingController inputNoiDung;
 
   void _translate() {
     // Thay thế bằng API dịch thực sự nếu cần
     setState(() {
+      _inputText = inputNoiDung.text.trim();
       for (int i = 0; i < listSource.length; i++) {
         if (listSource[i].toLowerCase() == _inputText.toLowerCase()) {
           _translateText = listTarget[i];
@@ -104,13 +109,16 @@ class TranslateState extends State<Translate> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: Text('HỖ TRỢ GIAO TIẾP'),
+      ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             const Text(
-              'HỆ THỐNG HỖ TRỢ GIAO TIẾP CHO NGƯỜI DÂN TỘC',
+              'HỆ THỐNG HỖ TRỢ GIAO TIẾP CHO NGƯỜI DÂN TỘC PÀ THẺN VÀ DAO TRÊN ĐỊA BÀN HUYỆN LÂM BÌNH',
               textAlign: TextAlign.center,
               style: TextStyle(
                   fontSize: 15,
@@ -182,7 +190,7 @@ class TranslateState extends State<Translate> {
             ),
             const SizedBox(height: 16),
             TextField(
-              controller: TextEditingController(text: _inputText),
+              controller: inputNoiDung,
               decoration: const InputDecoration(
                 labelText: 'Nhập nội dung cần dịch',
                 border: OutlineInputBorder(),
@@ -222,23 +230,23 @@ class TranslateState extends State<Translate> {
             ),
             Expanded(
                 child: ListView.builder(
-                  itemCount: listSource.length,
-                  itemBuilder: (BuildContext context, int index) {
-                    final item = listSource[index];
-                    return ListTile(
-                        leading: Icon(
-                          Icons.text_snippet,
-                          color: Colors.blue,
-                        ),
-                        title: Text(item));
-                  },
-                ))
+              itemCount: listSource.length,
+              itemBuilder: (BuildContext context, int index) {
+                final item = listSource[index];
+                return ListTile(
+                    leading: Icon(
+                      Icons.text_snippet,
+                      color: Colors.blue,
+                    ),
+                    title: Text(item));
+              },
+            ))
           ],
         ),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed:
-        _speechToText.isNotListening ? _startListening : _stopListening,
+            _speechToText.isNotListening ? _startListening : _stopListening,
         tooltip: 'Listen',
         child: Icon(_speechToText.isNotListening ? Icons.mic_off : Icons.mic),
       ),
