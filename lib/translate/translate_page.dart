@@ -82,9 +82,11 @@ class TranslateState extends State<Translate> {
     setState(() {});
   }
 
+  // Cập nhật _inputText khi nhận được kết quả từ Speech-to-Text
   void _onSpeechResult(SpeechRecognitionResult result) {
     setState(() {
       _lastWords = result.recognizedWords;
+      _inputText = _lastWords; // Điền kết quả vào _inputText
     });
   }
 
@@ -181,16 +183,13 @@ class TranslateState extends State<Translate> {
             ),
             const SizedBox(height: 16),
             TextField(
+              controller: TextEditingController(text: _inputText), // Cập nhật TextField với _inputText
               decoration: const InputDecoration(
                 labelText: 'Nhập nội dung cần dịch',
                 border: OutlineInputBorder(),
               ),
               maxLines: 3,
-              onChanged: (text) {
-                setState(() {
-                  _inputText = text;
-                });
-              },
+
             ),
             const SizedBox(height: 16),
             ElevatedButton(
@@ -225,23 +224,23 @@ class TranslateState extends State<Translate> {
             ),
             Expanded(
                 child: ListView.builder(
-              itemCount: listSource.length,
-              itemBuilder: (BuildContext context, int index) {
-                final item = listSource[index];
-                return ListTile(
-                    leading: Icon(
-                      Icons.text_snippet,
-                      color: Colors.blue,
-                    ),
-                    title: Text(item));
-              },
-            ))
+                  itemCount: listSource.length,
+                  itemBuilder: (BuildContext context, int index) {
+                    final item = listSource[index];
+                    return ListTile(
+                        leading: Icon(
+                          Icons.text_snippet,
+                          color: Colors.blue,
+                        ),
+                        title: Text(item));
+                  },
+                ))
           ],
         ),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed:
-            _speechToText.isNotListening ? _startListening : _stopListening,
+        _speechToText.isNotListening ? _startListening : _stopListening,
         tooltip: 'Listen',
         child: Icon(_speechToText.isNotListening ? Icons.mic_off : Icons.mic),
       ),
