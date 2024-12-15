@@ -82,11 +82,10 @@ class TranslateState extends State<Translate> {
     setState(() {});
   }
 
-  // Cập nhật _inputText khi nhận được kết quả từ Speech-to-Text
   void _onSpeechResult(SpeechRecognitionResult result) {
     setState(() {
       _lastWords = result.recognizedWords;
-      _inputText = _lastWords; // Điền kết quả vào _inputText
+      _inputText = _lastWords;
     });
   }
 
@@ -183,13 +182,12 @@ class TranslateState extends State<Translate> {
             ),
             const SizedBox(height: 16),
             TextField(
-              controller: TextEditingController(text: _inputText), // Cập nhật TextField với _inputText
+              controller: TextEditingController(text: _inputText),
               decoration: const InputDecoration(
                 labelText: 'Nhập nội dung cần dịch',
                 border: OutlineInputBorder(),
               ),
               maxLines: 3,
-
             ),
             const SizedBox(height: 16),
             ElevatedButton(
