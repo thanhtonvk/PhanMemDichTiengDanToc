@@ -2,8 +2,6 @@ import 'dart:async';
 
 import 'package:dich_tieng_dan_toc/translate/translate_page.dart';
 import 'package:flutter/material.dart';
-import 'package:speech_to_text/speech_recognition_result.dart';
-import 'package:speech_to_text/speech_to_text.dart';
 
 void main() {
   runApp(MyApp());
