@@ -96,11 +96,19 @@ class TranslateState extends State<Translate> {
   void _translate() {
     // Thay thế bằng API dịch thực sự nếu cần
     setState(() {
-      _inputText = inputNoiDung.text.trim();
-      for (int i = 0; i < listSource.length; i++) {
-        if (listSource[i].toLowerCase() == _inputText.toLowerCase()) {
-          _translateText = listTarget[i];
-          break;
+      _translateText = "";
+      _inputText = inputNoiDung.text.toLowerCase().trim();
+      for (String word in _inputText.split(" ")) {
+        bool isExist = false;
+        for (int i = 0; i < listSource.length; i++) {
+          if (listSource[i].toLowerCase() == word.toLowerCase()) {
+            _translateText += "${listTarget[i].toLowerCase()} ";
+            isExist = true;
+            break;
+          }
+        }
+        if (!isExist) {
+          _translateText += "${word.toLowerCase()} ";
         }
       }
     });
