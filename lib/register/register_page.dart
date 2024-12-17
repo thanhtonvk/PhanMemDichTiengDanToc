@@ -1,6 +1,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import '../common.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_database/firebase_database.dart';
+
 class Register extends StatefulWidget {
   const Register({super.key});
 
@@ -13,6 +16,18 @@ class Register extends StatefulWidget {
 class RegisterState extends State<Register> {
   TextEditingController edtEmail = TextEditingController();
   TextEditingController edtPassword = TextEditingController();
+  final DatabaseReference dbRef = FirebaseDatabase.instance.ref();
+
+  void writeData(String email, String password) {
+    dbRef.child("users").push().set({
+      "email": email,
+      "password": password,
+    }).then((_) {
+      Common.showAlertDialog(context, "Thông báo", "Đăng ký thành công");
+    }).catchError((error) {
+      Common.showAlertDialog(context, "Thông báo", "Đăng ký thất bại");
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -26,19 +41,12 @@ class RegisterState extends State<Register> {
         backgroundColor: Colors.transparent,
         body: Stack(
           children: [
-            Center(
+            const Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: <Widget>[
-                  Image.asset(
-                    "assets/images/logo.png",
-                    width: 150,
-                    height: 150,
-                    fit: BoxFit.contain,
-                    scale: 0.1,
-                  ),
-                  const Text(
-                    "Bạn tốt - Tôi tốt - Chúng ta cùng tốt",
+                  Text(
+                    "PHẦN MỀM DỊCH TIẾNG DÂN TỘC",
                     style: TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 20,
@@ -99,9 +107,6 @@ class RegisterState extends State<Register> {
                           const SizedBox(
                             height: 15,
                           ),
-
-
-
                           const SizedBox(
                             height: 15,
                           ),
@@ -155,10 +160,9 @@ class RegisterState extends State<Register> {
   void register() {
     String email = edtEmail.text;
     String password = edtPassword.text;
-    if (email.isNotEmpty &&
-        password.isNotEmpty) {
+    if (email.isNotEmpty && password.isNotEmpty) {
       if (email.contains("@")) {
-
+        writeData(email, password);
       } else {
         Common.showAlertDialog(context, "Thông báo", "Email không hợp lệ");
       }

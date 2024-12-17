@@ -1,8 +1,12 @@
 import 'dart:ui';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
+import '../common.dart';
 import '../register/register_page.dart';
+import '../translate/translate_page.dart';
 
 void main() {
   runApp(Login());
@@ -20,16 +24,18 @@ class Login extends StatefulWidget {
 class LoginState extends State<Login> {
   TextEditingController edtEmail = TextEditingController();
   TextEditingController edtPassword = TextEditingController();
+  final DatabaseReference dbRef = FirebaseDatabase.instance.ref();
+
   void setEmailPassword(String email, String password) async {
-    // SharedPreferences prefs = await SharedPreferences.getInstance();
-    // prefs.setString("email", email);
-    // prefs.setString("password", password);
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.setString("email", email);
+    prefs.setString("password", password);
   }
 
   void getEmailPassword() async {
-    // SharedPreferences prefs = await SharedPreferences.getInstance();
-    // edtEmail.text = prefs.getString("email")!;
-    // edtPassword.text = prefs.getString("password")!;
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    edtEmail.text = prefs.getString("email")!;
+    edtPassword.text = prefs.getString("password")!;
   }
 
   @override
@@ -51,12 +57,11 @@ class LoginState extends State<Login> {
         backgroundColor: Colors.transparent,
         body: Stack(
           children: [
-            Center(
+            const Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: <Widget>[
-
-                  const Text(
+                  Text(
                     "PHẦN MỀM DỊCH TIẾNG DÂN TỘC",
                     style: TextStyle(
                         fontWeight: FontWeight.bold,
@@ -162,6 +167,7 @@ class LoginState extends State<Login> {
     );
   }
 
+
   void navToRegister() {
     Navigator.push(
       context,
@@ -169,9 +175,47 @@ class LoginState extends State<Login> {
     );
   }
 
-  void login() {
-    String email = edtEmail.text;
-    String password = edtPassword.text;
+  Future<void> login() async {
+    String email = edtEmail.text.trim(); // Loại bỏ khoảng trắng
+    String password = edtPassword.text.trim();
 
+    // Kiểm tra trường nhập
+    if (email.isEmpty || password.isEmpty) {
+      Common.showAlertDialog(
+          context, "Thông báo", "Vui lòng nhập đầy đủ email và mật khẩu.");
+      return;
+    }
+
+    try {
+      final snapshot = await dbRef.child("users").get();
+
+      // Biến để xác định email và password có hợp lệ hay không
+      bool isValidUser = false;
+
+      for (DataSnapshot dataSnapshot in snapshot.children) {
+        String dbEmail = dataSnapshot.child("email").value.toString();
+        String dbPassword = dataSnapshot.child("password").value.toString();
+
+        if (dbEmail == email && dbPassword == password) {
+          isValidUser = true;
+          // Điều hướng sang trang mới nếu hợp lệ
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => Translate()),
+          );
+          break; // Thoát vòng lặp
+        }
+      }
+
+      // Nếu không tìm thấy email và mật khẩu hợp lệ
+      if (!isValidUser) {
+        Common.showAlertDialog(
+            context, "Thông báo", "Email hoặc mật khẩu không đúng.");
+      }
+    } catch (e) {
+      print("Lỗi kiểm tra dữ liệu: $e");
+      Common.showAlertDialog(
+          context, "Lỗi", "Có lỗi xảy ra khi kiểm tra dữ liệu.");
+    }
   }
 }

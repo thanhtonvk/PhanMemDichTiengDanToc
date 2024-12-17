@@ -1,9 +1,15 @@
 import 'dart:async';
 
-import 'package:dich_tieng_dan_toc/translate/translate_page.dart';
 import 'package:flutter/material.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
+import 'login/login_page.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
   runApp(MyApp());
 }
 
@@ -41,7 +47,7 @@ class _MyHomePageState extends State<MyHomePage> {
           _seconds--;
         } else {
           Navigator.of(context).pushReplacement(
-              MaterialPageRoute(builder: (context) => const Translate()));
+              MaterialPageRoute(builder: (context) => const Login()));
           timer.cancel();
 
           // Stop the timer when countdown reaches 0
