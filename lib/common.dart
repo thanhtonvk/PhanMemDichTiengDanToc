@@ -812,6 +812,7 @@ class Common {
     'Mươi xí',
     'Pó mò'];
 
+
   static void showLoadingDialog(BuildContext context, String text) {
     showDialog(
       context: context,

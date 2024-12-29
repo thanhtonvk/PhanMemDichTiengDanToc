@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
-import 'login/login_page.dart';
+import 'translate/translate_page.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -47,7 +47,7 @@ class _MyHomePageState extends State<MyHomePage> {
           _seconds--;
         } else {
           Navigator.of(context).pushReplacement(
-              MaterialPageRoute(builder: (context) => const Login()));
+              MaterialPageRoute(builder: (context) => const Translate()));
           timer.cancel();
 
           // Stop the timer when countdown reaches 0

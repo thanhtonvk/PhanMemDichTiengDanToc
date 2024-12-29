@@ -77,12 +77,6 @@ class TranslateState extends State<Translate> {
     await _speechToText.listen(onResult: _onSpeechResult, localeId: 'vi_VN');
     setState(() {});
   }
-
-  void _stopListening() async {
-    await _speechToText.stop();
-    setState(() {});
-  }
-
   void _onSpeechResult(SpeechRecognitionResult result) {
     setState(() {
       _lastWords = result.recognizedWords;
@@ -90,6 +84,13 @@ class TranslateState extends State<Translate> {
       inputNoiDung.text = _inputText;
     });
   }
+
+  void _stopListening() async {
+    await _speechToText.stop();
+    setState(() {});
+  }
+
+
 
   late TextEditingController inputNoiDung;
 
@@ -118,7 +119,7 @@ class TranslateState extends State<Translate> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('HỖ TRỢ GIAO TIẾP'),
+        title: Text('HPL - HỖ TRỢ GIAO TIẾP'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -242,7 +243,7 @@ class TranslateState extends State<Translate> {
               itemBuilder: (BuildContext context, int index) {
                 final item = listSource[index];
                 return ListTile(
-                    leading: Icon(
+                    leading: const Icon(
                       Icons.text_snippet,
                       color: Colors.blue,
                     ),
