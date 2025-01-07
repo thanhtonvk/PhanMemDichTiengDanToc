@@ -28,6 +28,7 @@ class TranslateState extends State<Translate> {
   List<String> listTarget = Common.pathen;
   String _inputText = '';
   String _translateText = '';
+  bool toWords = false;
   final List<String> _languages = [
     'Kinh',
     'Anh',
@@ -46,7 +47,7 @@ class TranslateState extends State<Translate> {
 
   Future<void> _setupTTS(String lang) async {
     await flutterTts.setLanguage(lang); // Tiếng Việt
-    await flutterTts.setSpeechRate(0.7); // Tốc độ nói
+    await flutterTts.setSpeechRate(0.6); // Tốc độ nói
     await flutterTts.setPitch(1.0); // Cao độ
   }
 
@@ -77,11 +78,13 @@ class TranslateState extends State<Translate> {
     await _speechToText.listen(onResult: _onSpeechResult, localeId: 'vi_VN');
     setState(() {});
   }
+
   void _onSpeechResult(SpeechRecognitionResult result) {
     setState(() {
       _lastWords = result.recognizedWords;
       _inputText = _lastWords;
       inputNoiDung.text = _inputText;
+      _translate();
     });
   }
 
@@ -90,26 +93,33 @@ class TranslateState extends State<Translate> {
     setState(() {});
   }
 
-
-
   late TextEditingController inputNoiDung;
 
   void _translate() {
-    // Thay thế bằng API dịch thực sự nếu cần
     setState(() {
       _translateText = "";
       _inputText = inputNoiDung.text.toLowerCase().trim();
-      for (String word in _inputText.split(" ")) {
-        bool isExist = false;
-        for (int i = 0; i < listSource.length; i++) {
-          if (listSource[i].toLowerCase() == word.toLowerCase()) {
-            _translateText += "${listTarget[i].toLowerCase()} ";
-            isExist = true;
-            break;
+
+      if (toWords) {
+        for (String word in _inputText.split(" ")) {
+          bool isExist = false;
+          for (int i = 0; i < listSource.length; i++) {
+            if (listSource[i].toLowerCase() == word.toLowerCase()) {
+              _translateText += "${listTarget[i].toLowerCase()} ";
+              isExist = true;
+              break;
+            }
+          }
+          if (!isExist) {
+            _translateText += "${word.toLowerCase()} ";
           }
         }
-        if (!isExist) {
-          _translateText += "${word.toLowerCase()} ";
+      } else {
+        for (int i = 0; i < listSource.length; i++) {
+          if (listSource[i].toLowerCase().trim() == _inputText) {
+            _translateText += "${listTarget[i].toLowerCase()} ";
+            break;
+          }
         }
       }
     });
@@ -233,6 +243,21 @@ class TranslateState extends State<Translate> {
                 }
               },
               child: const Text('Phát âm nội dung dịch'),
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text('Câu', style: TextStyle(fontSize: 18)),
+                Switch(
+                  value: toWords,
+                  onChanged: (value) {
+                    setState(() {
+                      toWords = value; // Cập nhật giá trị toWords trực tiếp
+                    });
+                  },
+                ),
+                Text('Từ', style: TextStyle(fontSize: 18)),
+              ],
             ),
             const SizedBox(
               height: 16,
